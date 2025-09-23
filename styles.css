@@ -73,7 +73,8 @@ section {
 /* 🎵 Contenedor principal */
 .songs-container {
   position: relative;
-  z-index: 3; /* Para estar encima del gradient */
+  z-index: 3;
+  /* Para estar encima del gradient */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -143,5 +144,298 @@ section {
 
   .card-body {
     font-size: 0.85rem;
+  }
+}
+
+/* Default = desktop */
+.carousel {
+  display: block;
+}
+
+.mobile-cards {
+  display: none;
+}
+
+/* Mobile: hide carousel, show cards */
+@media (max-width: 768px) {
+  .carousel {
+    display: none !important;
+  }
+
+  .mobile-cards {
+    display: flex !important;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* ---------------------------
+Base (kept from your css)
+--------------------------- */
+
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0
+}
+
+html,
+body {
+  height: 100%
+}
+
+body {
+  font-family: "Host Grotesk", system-ui, Segoe UI, Roboto, -apple-system, Arial;
+  background: #0b0b0b;
+  color: #fff
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block
+}
+
+nav {
+  position: absolute;
+  left: 0;
+  width: 100vw;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 6
+}
+
+nav .logo p {
+  font-weight: 700
+}
+
+section {
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  overflow: hidden
+}
+
+.gradient-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%
+}
+
+
+
+
+/* ---------------------------
+Card + layout
+--------------------------- */
+.songs-container {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  width: 100%;
+  height: 100%
+}
+
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 1100px;
+  /* bigger on desktop as requested */
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform .25s ease, box-shadow .25s ease;
+  min-height: 420px;
+  /* ensures nice card height */
+}
+
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .45)
+}
+
+
+.card-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem
+}
+
+.card-body {
+  font-size: 1rem;
+  line-height: 1.5;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+
+
+/* ---------------------------
+Carousel specific styles
+--------------------------- */
+.carousel {
+  position: relative;
+  width:74%;
+  height: 100%;
+  display: flex;
+  flex-direction: column
+}
+
+
+/* visible window */
+.carousel-track-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  flex: 1;
+  display: block
+}
+
+
+/* moving track */
+.carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform .45s cubic-bezier(.22, .9, .35, 1);
+  will-change: transform
+}
+
+
+/* per-slide */
+.carousel-slide {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem
+}
+
+
+/* placeholder content inside slides */
+.slide-placeholder {
+  width: 92%;
+  height: 86%;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.75);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.00));
+}
+
+
+/* nav arrows */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.28);
+  border: none;
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.4)
+}
+
+.carousel-button:active {
+  transform: translateY(-50%) scale(.98)
+}
+
+.carousel-button[disabled] {
+  opacity: .35;
+  cursor: not-allowed
+}
+
+.carousel-button.prev {
+  left: 12px
+}
+
+.carousel-button.next {
+  right: 12px
+}
+
+
+/* slide counter dots */
+.carousel-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  display: flex;
+  gap: .6rem;
+  z-index: 6
+}
+
+.carousel-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform .18s ease, background .18s ease
+}
+
+.carousel-indicator.active {
+  transform: scale(1.35);
+  background: linear-gradient(90deg, #fff9, #fff)
+}
+
+
+/* responsive tweaks */
+@media(min-width:1100px) {
+  .glass-card {
+    min-height: 540px;
+    padding: 2rem
+  }
+
+  .card-header h2 {
+    font-size: 1.6rem
+  }
+}
+
+
+@media(max-width:768px) {
+  nav {
+    flex-direction: column;
+    gap: 1rem
+  }
+
+  .glass-card {
+    padding: 1rem;
+    min-height: 360px;
+    border-radius: 1rem
+  }
+
+  .slide-placeholder {
+    height: 86%
   }
 }

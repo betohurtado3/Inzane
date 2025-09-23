@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebGL Interactive Gradient | Codegrid</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Inzane — Carousel (step 1)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -14,30 +19,173 @@
     </nav>
 
     <section class="hero">
-      <div class="gradient-canvas"></div>
-
-      <div class="hero-logo">
-        <img src="/logo.png" alt="Inzane Logo" />
-      </div>
+      <div class="gradient-canvas" aria-hidden="true"></div>
 
       <!-- 🎵 Card Principal -->
-      
       <div class="songs-container">
-        
-        <div class="glass-card">
+        <div class="glass-card" role="region" aria-label="Canciones destacadas">
           <div class="card-header">
             <h2>Canciones Destacadas</h2>
           </div>
-          <div class="card-body">
 
+          <div class="card-body">
+            <!-- 🎠 Desktop carousel -->
+            <div class="carousel" id="mainCarousel">
+              <div class="carousel-track-container">
+                <ul class="carousel-track" role="list">
+                  <li class="carousel-slide" role="listitem">
+                    <div class="slide-placeholder">
+                      <img
+                        src="public/logo.png"
+                        alt="Logo (bat image)"
+                        style="max-width: 900px"
+                      />
+                    </div>
+                  </li>
+                  <li class="carousel-slide" role="listitem">
+                    <div class="slide-placeholder">
+                      Slide 2 - (Songs placeholder)
+                    </div>
+                  </li>
+                  <li class="carousel-slide" role="listitem">
+                    <div class="slide-placeholder">
+                      Slide 3 - (Socials placeholder)
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <!-- arrows -->
+              <button class="carousel-button prev" aria-label="Previous slide">
+                ◀
+              </button>
+              <button class="carousel-button next" aria-label="Next slide">
+                ▶
+              </button>
+              <!-- dots -->
+              <div class="carousel-nav"></div>
+            </div>
+          </div>
+          <!-- 📱 Mobile stacked cards -->
+          <div class="mobile-cards">
+            <div class="mobile-card logo-card">
+              <div class="slide-placeholder"><img
+                        src="public/logo.png"
+                        alt="Logo (bat image)"
+                        style="max-width: 500px"
+                      /></div>
+            </div>
+            <div class="mobile-card songs-card">
+              <div class="slide-placeholder">Songs list</div>
+            </div>
+            <div class="mobile-card socials-card">
+              <div class="slide-placeholder">Social media icons</div>
+            </div>
           </div>
         </div>
-        
       </div>
-      
     </section>
 
     <script type="module" src="/shaders.js"></script>
     <script type="module" src="/script.js"></script>
+
+    <script>
+      (function () {
+        const carousel = document.getElementById("mainCarousel");
+        if (!carousel) return;
+
+        const trackContainer = carousel.querySelector(
+          ".carousel-track-container"
+        );
+        const track = carousel.querySelector(".carousel-track");
+        const slides = Array.from(track.children);
+        const prevBtn = carousel.querySelector(".carousel-button.prev");
+        const nextBtn = carousel.querySelector(".carousel-button.next");
+        const nav = carousel.querySelector(".carousel-nav");
+        let index = 0;
+        let isDragging = false;
+        let startX = 0;
+        const threshold = 50;
+
+        nav.innerHTML = "";
+        slides.forEach((_, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "carousel-indicator";
+          btn.setAttribute("aria-label", `Go to slide ${i + 1}`);
+          btn.addEventListener("click", () => {
+            index = i;
+            update();
+          });
+          nav.appendChild(btn);
+        });
+        const indicators = Array.from(nav.children);
+
+        function update() {
+          const w = trackContainer.clientWidth;
+          track.style.transform = `translateX(-${index * w}px)`;
+          slides.forEach((s, i) => s.setAttribute("aria-hidden", i !== index));
+          indicators.forEach((b, i) =>
+            b.classList.toggle("active", i === index)
+          );
+          prevBtn.disabled = index === 0;
+          nextBtn.disabled = index === slides.length - 1;
+        }
+
+        prevBtn.addEventListener("click", () => {
+          if (index > 0) {
+            index--;
+            update();
+          }
+        });
+        nextBtn.addEventListener("click", () => {
+          if (index < slides.length - 1) {
+            index++;
+            update();
+          }
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowRight") nextBtn.click();
+          if (e.key === "ArrowLeft") prevBtn.click();
+        });
+
+        let startPos = 0;
+        trackContainer.addEventListener(
+          "touchstart",
+          (e) => {
+            startPos = e.touches[0].clientX;
+          },
+          { passive: true }
+        );
+        trackContainer.addEventListener("touchend", (e) => {
+          const endX =
+            (e.changedTouches && e.changedTouches[0].clientX) || startPos;
+          const dx = endX - startPos;
+          if (Math.abs(dx) > threshold) {
+            if (dx < 0 && index < slides.length - 1) index++;
+            if (dx > 0 && index > 0) index--;
+          }
+          update();
+        });
+
+        trackContainer.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          startX = e.clientX;
+        });
+        window.addEventListener("mouseup", (e) => {
+          if (!isDragging) return;
+          isDragging = false;
+          const dx = e.clientX - startX;
+          if (Math.abs(dx) > threshold) {
+            if (dx < 0 && index < slides.length - 1) index++;
+            if (dx > 0 && index > 0) index--;
+          }
+          update();
+        });
+
+        window.addEventListener("resize", update);
+        update();
+      })();
+    </script>
   </body>
 </html>
